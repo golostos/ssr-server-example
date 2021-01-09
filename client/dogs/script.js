@@ -59,8 +59,10 @@ async function renderDog(id) {
         root.innerHTML = /*html*/`
             <a class="link-primary" data-link href="${resource}/">Back to the main page</a>
             ${dogCard(dog)}
-            ${editButton(dog, 'edit')}
-            ${removeButton(dog, 'remove')}
+            <div>
+                ${editButton(dog, 'edit')}
+                ${removeButton(dog, 'remove')}
+            </div>
             `
         // @ts-ignore
         if (window.SSR) finishRender()

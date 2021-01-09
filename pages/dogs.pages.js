@@ -93,6 +93,7 @@ dogsPages.get('/:id/edit', async (req, res, next) => {
         // браузере. Тогда при рендере на сервере браузерный скрипт сразу сгенерирует страницу с формой, в
         // которой будут указаны ошибки и правильные значения. Этот html с ошибками в готовом виде придет в
         // браузер пользователя. Таким образом раньше работали PHP сайты при обработке ошибок формы.
+        // req.query появится только при редиректе с роута с POST запросом ниже по коду.
         const { html, statusCode } = await renderDogs(`/${id}/edit` + getQueryStr(req.query))
         res.status(statusCode).send(html)
     }
@@ -103,7 +104,7 @@ dogsPages.get('/:id/edit', async (req, res, next) => {
 dogsPages.get('/new', async (req, res) => {
     // Здесь getQueryStr аналогично используется для передачи данных об ошибках в браузерный скрипт,
     // когда этот скрипт рендерится на сервере. Если JS в браузере включен, то querystring в
-    // renderDogs не попадет
+    // renderDogs не попадет. req.query появится только при редиректе с роута с POST запросом ниже. 
     const { html, statusCode } = await renderDogs('/new' + getQueryStr(req.query))
     res.status(statusCode).send(html)
 })
@@ -130,6 +131,7 @@ dogsPages.get('/page-404', async (req, res) => {
 // если ни один из роутов выше по коду не сработал, или если в роутах выше был вызван next
 dogsPages.use([/^\/\d+/, '/'], express.static(CONFIG.static))
 
+// Роут для создания новой собачки.
 // Этот роут сработает только если у пользователя отключен JS в браузере. В этом случае при нажатии
 // в браузере кнопки submit в форме создания собачки на сервер пойдет POST запрос с данными из формы
 // в формате "application/x-www-form-urlencoded". Обратите внимание, что когда JS в браузере
@@ -138,23 +140,35 @@ dogsPages.use([/^\/\d+/, '/'], express.static(CONFIG.static))
 // формате. Этот роут заменяет собой в данном случае аналогичный роут из API. API работает только
 // когда в браузере включен JS и используется метод fetch
 dogsPages.post('/', async (req, res) => {
+    // делаем запрос к API для создания собачки
     const response = await request('POST', `${CONFIG.origin}/api/dog`, req.body)
+    // Если ок то редиректим пользователя на страницу с собачками
     if (response.ok) res.redirect(req.originalUrl)
     else if (response.status === 400) {
         const { errors } = await response.json()
         const query = createQueryStr(req.body, errors)
+        // если нет, то редиректим пользователя обратно на страницу создания собачки, но
+        // дополнительно передаем в querystring данные об ошибках валидации
         res.redirect(`${dropLastChar(req.originalUrl)}/new${query}`)
     }
 })
 
+// Роут для редактирования собачки. В остальном аналогичен предыдущему
+// Этот роут также сработает только если у пользователя отключен JS в браузере. 
 dogsPages.post('/:id/edit', async (req, res) => {
     const id = req.params.id
-    const response = await request('PATCH', `${CONFIG.origin}/api/dog/${id}`, req.body)    
-    if (response.ok) { }
+    // делаем запрос к API для редактирования собачки
+    const response = await request('PATCH', `${CONFIG.origin}/api/dog/${id}`, req.body)
+    // если ок, то редиректимся на страницу собачки (обрезаем /edit с конца URL) 
+    if (response.ok) res.redirect(req.originalUrl.slice(0,-5))
     else if (response.status === 404) {
+        // Если собачки не найдено до редиректим на 404 страницу и в querystring передаем сообщение
+        // об ошибке в кодироке urlencode
         res.redirect(`${dropLastChar(req.originalUrl)}/page-404?message=` +
             encodeURIComponent(`Can't find a dog with id ${id}`))
     } else if (response.status === 400) {
+        // Если ошибка валидации то редиректим обратно на страницу редактирования собачки с массивом
+        // ошибок в querystring
         const { errors } = await response.json()
         const query = createQueryStr(req.body, errors)
         res.redirect(`${dropLastChar(req.originalUrl)}${query}`)
