@@ -2,12 +2,12 @@
 
 Чтобы скачать репозиторий себе надо выполнить в какой-то папке на вашем компьютере данную команду в консоли:
 
-`git clone https://github.com/testovaask5/dogs-api-express.git`
+`git clone https://github.com/golostos/ssr-server-example.git`
 
 Далее необходимо установить зависимости нашего приложения (установить express и nodemon):
 
 ```sh
-cd dogs-api-express
+cd ssr-server-example
 npm install
 ```
 
