@@ -1,0 +1,25 @@
+{
+  "name": "express_ov4",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development nodemon --ignore client --ignore node_modules app.js",
+    "start": "pm2 start app.js --watch --name dogs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.9.2",
+    "mysql2": "^2.2.5",
+    "sequelize": "^6.3.5",
+    "ssr-render-page": "^0.3.3"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "nodemon": "^2.0.6"
+  }
+}

@@ -1,0 +1,43 @@
+.btn-full-width {
+    width: 100%;
+}
+
+form {
+    margin-top: 1rem;
+}
+
+.card {
+    margin: 1rem 0;
+}
+
+.dogs-list {
+    margin: 1rem 0;
+    overflow: auto;
+}
+
+.list-group-item {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.list-group-item .link-primary {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+}
+
+h1 {
+    font-weight: 300;
+    font-size: 3rem;
+    text-align: center;
+}
+
+.container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    min-width: 350px;
+}
